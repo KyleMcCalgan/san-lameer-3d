@@ -29,6 +29,7 @@ loaded from the jsDelivr CDN through an import map, so an internet connection is
 | **Shift** | Walk faster |
 | **Esc** | Release the mouse |
 | **M** | Floor plan (click a room to jump there) |
+| **V** | 3D model view: orbit the house, cut it open by floor, click a room or the floor to walk in |
 | **P** | Original photos of the current room |
 | **R** | Reset to the entrance hall |
 
@@ -63,6 +64,7 @@ website/
 │   ├── builder.js           geometry helpers, materials, collision registry
 │   ├── textures.js          procedural canvas textures (timber, tiles, carpet, granite…)
 │   ├── controls.js          first-person controller, collisions, touch joystick
+│   ├── model.js             3D model view: orbit camera, floor cutaways, room labels, walk-in picking
 │   └── ui.js                floor-plan map, room selector, photo viewer
 └── assets/references/<room>/  the 17 unique listing photos, grouped by room
 ```

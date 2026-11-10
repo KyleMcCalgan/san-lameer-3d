@@ -180,6 +180,7 @@ export class Walker {
   unlock() { if (document.pointerLockElement) document.exitPointerLock(); }
 
   look(dx, dy) {
+    if (!this.enabled) return;
     this.yaw -= dx;
     this.pitch = Math.max(-1.45, Math.min(1.45, this.pitch - dy));
   }

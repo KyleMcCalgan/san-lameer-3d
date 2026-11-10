@@ -4,6 +4,7 @@ import { initMaterials, colliders, M } from './builder.js';
 import { buildVilla } from './villa.js';
 import { Walker } from './controls.js';
 import { UI } from './ui.js';
+import { ModelView } from './model.js';
 
 const status = document.getElementById('loadStatus');
 const setStatus = t => { if (status) status.textContent = t; };
@@ -79,6 +80,8 @@ async function init() {
   walker.enabled = false;
 
   let dirty = true;
+  const model = new ModelView({ camera, renderer, scene, walker, ui, canvas, invalidate: () => { dirty = true; } });
+  ui.model = model;
   addEventListener('resize', () => {
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
@@ -94,8 +97,7 @@ async function init() {
   renderer.setAnimationLoop(() => {
     const dt = Math.min(clock.getDelta(), 0.1);
     if (!ui.started) walker.yaw += dt * 0.05;
-    walker.update(dt);
-    ui.update();
+    if (!model.update(dt)) { walker.update(dt); ui.update(); }
     // Only redraw when the view actually changed (saves GPU/battery while standing still).
     const pose = [camera.position.x, camera.position.y, camera.position.z, camera.rotation.x, camera.rotation.y];
     let moved = dirty;
@@ -116,11 +118,12 @@ async function init() {
       firstFrame = false;
       document.getElementById('loading').classList.add('done');
       document.getElementById('enterBtn').disabled = false;
+      document.getElementById('modelBtn').disabled = false;
     }
   });
 
   // debugging / automated testing hook
-  window.__villa = { walker, ui, scene, renderer, camera, colliders };
+  window.__villa = { walker, ui, scene, renderer, camera, colliders, model };
 }
 
 // Merge all static meshes per material to cut draw calls (~1500 meshes -> ~60).

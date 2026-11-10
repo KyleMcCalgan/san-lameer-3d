@@ -15,7 +15,7 @@ export class UI {
     $('enterBtn').addEventListener('click', () => this.start());
     $('resumeHint').addEventListener('click', () => this.w.lock());
     walker.onLockChange = locked => {
-      $('resumeHint').hidden = locked || !this.started || this.panelOpen() || this.isTouch;
+      $('resumeHint').hidden = locked || !this.started || this.panelOpen() || this.isTouch || !!(this.model && this.model.active);
       document.body.classList.toggle('locked', locked);
     };
 
@@ -23,6 +23,8 @@ export class UI {
     $('btnMap').addEventListener('click', () => this.toggleMap());
     $('btnPhotos').addEventListener('click', () => this.togglePhotos());
     $('btnReset').addEventListener('click', () => this.reset());
+    $('btnModel').addEventListener('click', () => this.model && this.model.toggle());
+    $('modelBtn').addEventListener('click', () => { this.start(false); this.model && this.model.enter(); });
     $('mapClose').addEventListener('click', () => this.toggleMap(false));
     $('photosClose').addEventListener('click', () => this.togglePhotos(false));
     $('lightbox').addEventListener('click', () => { $('lightbox').hidden = true; });
@@ -54,6 +56,8 @@ export class UI {
     addEventListener('keydown', e => {
       if (!this.started || e.repeat) return;
       if (e.target && e.target.tagName === 'SELECT') return;
+      if (e.code === 'KeyV') { this.model && this.model.toggle(); return; }
+      if (this.model && this.model.active) return;
       if (e.code === 'KeyM') this.toggleMap();
       else if (e.code === 'KeyR') this.reset();
       else if (e.code === 'KeyP') this.togglePhotos();
@@ -72,10 +76,11 @@ export class UI {
 
   panelOpen() { return !$('mapPanel').hidden || !$('photosPanel').hidden; }
 
-  start() {
+  start(walk = true) {
     this.started = true;
     $('startScreen').hidden = true;
     document.body.classList.add('started');
+    if (!walk) return;
     this.w.enabled = true;
     this.w.lock();
     this.onStart && this.onStart();
@@ -86,6 +91,7 @@ export class UI {
   }
 
   goToRoom(r) {
+    if (this.model && this.model.active) { this.model.walkInto(r); return; }
     const [x, z, yaw] = r.spawn;
     this.w.teleport(x, z, spawnHeight(r) + 0.01, yaw, 0);
     this.flash(r.name);
@@ -93,6 +99,11 @@ export class UI {
 
   goToView(v) {
     const [x, eye, z, yaw, pitch] = v;
+    if (this.model && this.model.active) {
+      this.togglePhotos(false);
+      this.model.walkTo({ x, z, feet: eye - 1.5, yaw: (yaw * Math.PI) / 180, pitch: (pitch * Math.PI) / 180 });
+      return;
+    }
     this.w.teleport(x, z, eye - 1.5, yaw, pitch);
     this.togglePhotos(false);
     this.toggleMap(false);

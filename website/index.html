@@ -42,6 +42,7 @@
         <span><kbd>Mouse</kbd> look</span>
         <span><kbd>Shift</kbd> faster</span>
         <span><kbd>M</kbd> floor plan</span>
+        <span><kbd>V</kbd> 3D model</span>
         <span><kbd>P</kbd> photos</span>
         <span><kbd>R</kbd> reset</span>
         <span><kbd>Esc</kbd> release mouse</span>
@@ -50,7 +51,10 @@
         <span>Left thumb: joystick to walk</span>
         <span>Right thumb: drag to look around</span>
       </div>
-      <button id="enterBtn" class="primary" disabled>Enter walkthrough</button>
+      <div class="start-actions">
+        <button id="enterBtn" class="primary" disabled>Enter walkthrough</button>
+        <button id="modelBtn" class="secondary" disabled>Explore the 3D model</button>
+      </div>
       <p class="fine">The layout is inferred from photos, not a floor plan. Read <a href="LAYOUT_ASSUMPTIONS.md" target="_blank" rel="noopener">LAYOUT_ASSUMPTIONS.md</a> for what is known and what is a guess.</p>
     </div>
   </section>
@@ -65,13 +69,17 @@
   </div>
 
   <div class="hud bl panel desktop-only keys">
-    <span><kbd>WASD</kbd> walk</span><span><kbd>Shift</kbd> fast</span><span><kbd>M</kbd> map</span><span><kbd>P</kbd> photos</span><span><kbd>R</kbd> reset</span><span><kbd>Esc</kbd> free mouse</span>
+    <span><kbd>WASD</kbd> walk</span><span><kbd>Shift</kbd> fast</span><span><kbd>M</kbd> map</span><span><kbd>P</kbd> photos</span><span><kbd>R</kbd> reset</span><span><kbd>V</kbd> 3D model</span><span><kbd>Esc</kbd> free mouse</span>
   </div>
   <div id="joyBase" class="touch-only" aria-label="Movement joystick"><div id="joyKnob"></div></div>
 
   <nav class="hud br">
     <select id="roomSelect" aria-label="Jump to room"></select>
     <div class="btnrow">
+      <button id="btnModel" class="tool" title="3D model (V)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Zm0 0v18M4 7.5l8 4.5 8-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span class="lbl-walk">3D model</span><span class="lbl-model">Walk</span>
+      </button>
       <button id="btnMap" class="tool" title="Floor plan (M)">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Zm0 0v14m6-12v14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
         <span>Floor plan</span>
@@ -86,6 +94,24 @@
       </button>
     </div>
   </nav>
+
+  <!-- 3D model view -->
+  <div id="modelBar" class="panel">
+    <div class="seg" role="group" aria-label="Cutaway">
+      <button data-cut="all">Whole house</button>
+      <button data-cut="upper">Upper floor</button>
+      <button data-cut="ground" class="active">Ground floor</button>
+    </div>
+    <button id="modelSpin" class="chip" title="Slowly rotate the model">Spin</button>
+    <button id="modelExit" class="chip accent">Walk in</button>
+  </div>
+  <p id="modelHint" class="panel">
+    <span class="desktop-only">Drag to orbit · right-drag to pan · scroll to zoom.</span>
+    <span class="touch-only">Drag to orbit · pinch to zoom · two fingers to pan.</span>
+    Tap a room name or the floor to walk in there.
+  </p>
+  <div id="modelLabels" aria-label="Rooms"></div>
+  <button id="walkHere" class="panel" hidden><b>Walk in here</b><span id="walkHereRoom"></span></button>
 
   <div id="crosshair" aria-hidden="true"></div>
   <button id="resumeHint" class="panel" hidden>Click to look around</button>
