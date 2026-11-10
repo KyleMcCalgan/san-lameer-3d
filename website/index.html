@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>San Lameer Villa Tour</title>
+  <meta name="description" content="An approximate, explorable 3D reconstruction of a 3-bedroom classic holiday villa at San Lameer, KwaZulu-Natal, built from the listing photographs.">
+  <meta name="theme-color" content="#1b1d20">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 15 16 5l12 10v12H4z' fill='%23d9774a'/%3E%3Crect x='13' y='18' width='6' height='9' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <canvas id="scene" aria-label="3D view of the villa"></canvas>
+
+  <!-- loading -->
+  <div id="loading">
+    <div class="spinner" aria-hidden="true"></div>
+    <p id="loadStatus">Loading 3D engine…</p>
+  </div>
+
+  <!-- start screen -->
+  <section id="startScreen" class="overlay">
+    <div class="card start">
+      <p class="eyebrow">San Lameer · KwaZulu-Natal</p>
+      <h1>3 Bedroom Classic Villa</h1>
+      <p class="lead">An approximate 3D reconstruction built from the 17 listing photographs. Walk through the rooms, check the layout, then compare each space with the real photos.</p>
+      <ul class="facts">
+        <li><b>219 m²</b> listed</li>
+        <li><b>Sleeps 8</b> · 1 king, 6 singles</li>
+        <li><b>3 en-suites</b> + loft</li>
+      </ul>
+      <div class="howto desktop-only">
+        <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> walk</span>
+        <span><kbd>Mouse</kbd> look</span>
+        <span><kbd>Shift</kbd> faster</span>
+        <span><kbd>M</kbd> floor plan</span>
+        <span><kbd>P</kbd> photos</span>
+        <span><kbd>R</kbd> reset</span>
+        <span><kbd>Esc</kbd> release mouse</span>
+      </div>
+      <div class="howto touch-only">
+        <span>Left thumb: joystick to walk</span>
+        <span>Right thumb: drag to look around</span>
+      </div>
+      <button id="enterBtn" class="primary" disabled>Enter walkthrough</button>
+      <p class="fine">The layout is inferred from photos, not a floor plan. Read <a href="LAYOUT_ASSUMPTIONS.md" target="_blank" rel="noopener">LAYOUT_ASSUMPTIONS.md</a> for what is known and what is a guess.</p>
+    </div>
+  </section>
+
+  <!-- HUD -->
+  <header class="hud tl panel">
+    <span class="title">San Lameer Villa</span><span class="sub">3D Tour</span>
+  </header>
+  <div class="hud tr panel" aria-live="polite">
+    <span id="roomName">–</span>
+    <span id="roomBadge" class="badge"></span>
+  </div>
+
+  <div class="hud bl panel desktop-only keys">
+    <span><kbd>WASD</kbd> walk</span><span><kbd>Shift</kbd> fast</span><span><kbd>M</kbd> map</span><span><kbd>P</kbd> photos</span><span><kbd>R</kbd> reset</span><span><kbd>Esc</kbd> free mouse</span>
+  </div>
+  <div id="joyBase" class="touch-only" aria-label="Movement joystick"><div id="joyKnob"></div></div>
+
+  <nav class="hud br">
+    <select id="roomSelect" aria-label="Jump to room"></select>
+    <div class="btnrow">
+      <button id="btnMap" class="tool" title="Floor plan (M)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Zm0 0v14m6-12v14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span>Floor plan</span>
+      </button>
+      <button id="btnPhotos" class="tool" title="Original photos (P)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="10" r="1.8" fill="currentColor"/><path d="m4 18 5-5 4 4 3-3 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span>Photos</span>
+      </button>
+      <button id="btnReset" class="tool" title="Reset position (R)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Reset</span>
+      </button>
+    </div>
+  </nav>
+
+  <div id="crosshair" aria-hidden="true"></div>
+  <button id="resumeHint" class="panel" hidden>Click to look around</button>
+  <div id="toast" aria-live="polite"></div>
+
+  <!-- floor plan -->
+  <section id="mapPanel" class="sheet panel" hidden>
+    <div class="sheet-head">
+      <h2>Floor plan</h2>
+      <div class="seg">
+        <button data-level="G">Ground</button>
+        <button data-level="U">Upper</button>
+      </div>
+      <button id="mapClose" class="x" aria-label="Close floor plan">×</button>
+    </div>
+    <canvas id="mapCanvas"></canvas>
+    <p class="legend">
+      <i class="sw room"></i>Seen in photos <i class="sw inferred"></i>Inferred <i class="sw here"></i>You are here. Tap a room to go there.
+    </p>
+  </section>
+
+  <!-- photos -->
+  <section id="photosPanel" class="sheet panel" hidden>
+    <div class="sheet-head">
+      <h2><span class="muted">Original photos:</span> <span id="photosTitle"></span></h2>
+      <button id="photosClose" class="x" aria-label="Close photos">×</button>
+    </div>
+    <div id="photosList"></div>
+  </section>
+
+  <div id="lightbox" hidden>
+    <img id="lightboxImg" alt="">
+    <p id="lightboxCap"></p>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
