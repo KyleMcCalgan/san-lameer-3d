@@ -148,3 +148,87 @@ not a surveyed floor plan.
 long outside edge accommodates four stools, and a clear entrance remains on the
 stove and fridge side. The peninsula has been widened and its stools moved outside
 the overhanging edge. The exact dimensions and circulation remain approximate.
+
+
+## Patio, braai wall and roof correction
+
+The earlier model gave the patio a flat 2.6 m ceiling, placed the braai in the middle of the
+end wall and roofed the whole deck. The patio photos contradict all three:
+
+- **Raked ceiling (seen).** In `patio-1` the timber ceiling meets the wall above the lounge
+  sliders far above the 2.35 m sliders, at roughly 4 m. It then falls away from the house; the
+  top edge of the end wall slopes down in `patio-1` and `patio-2`. At the outer edge the ceiling
+  sits on a dark timber beam whose underside is at about the height of the door head (≈2.1 m).
+  Modelled as a lean-to rising from 2.35 m at the edge beam to 4.0 m at the slider wall.
+- **Braai wall order (seen).** Starting from the slider corner: a chimney breast with the
+  braai over an open wood store and a tiled ledge, running up through the roof as the chimney;
+  then a tiled shelf niche with a plug point; then a rendered pillar about 2.3 m tall; and
+  directly behind the pillar, the frosted door to the main bedroom. In `patio-2` the pillar
+  hides most of the door, which is why the door looks so narrow there.
+- **Door position (seen in two rooms).** In `main-bedroom-1` the frosted door is about 0.35 m
+  from the corner with the dressing-table wall, and the Juliet window sits further along the
+  same wall. The door and window have been moved to match. The tub chair now sits between them.
+- **Uncovered sun deck (seen, extent inferred).** In `patio-3` the loungers stand in the sun
+  past the roof edge. A rendered pillar and a timber post mark the roof corner, and the railing
+  carries on past it. The deck now continues about 2.6 m beyond the edge beam. Its exact size is
+  an estimate.
+
+Still uncertain: in `patio-2` a railing seems to continue in line with the braai wall beyond
+the pier. That could mean the bedroom wall steps back past the door. The model keeps a straight
+bedroom wall (medium-low confidence). The roof heights are photo estimates (±0.3 m).
+
+
+## Bedroom-wing entrance under the landing
+
+In `living-1` the doorway to the bedroom wing is at the far right of the photo. It sits in the white
+wall under the high end of the stair, not in the lounge's back wall. That doorway is now in the
+wall under the landing. It opens into a short passage beneath the landing, and the passage turns
+east into the bedroom hall. To give that turn a full-width opening, the wall between the hall and
+bedroom 2 moved 0.4 m north, and bedroom 2's door moved to the east end of that wall.
+The lounge's back wall under the loft is now solid.
+
+No photo or listing fact supported the inferred laundry, so it has been removed. The hall now ends
+just past the main-bedroom door (z = 2.5). The leftover space behind the braai is closed off as a
+void. The passage under the landing opens full width into the hall, and the under-stair door is
+0.95 m wide. These hall dimensions are inferred; no photo shows them.
+
+
+## Main bedroom rearrangement (owner's direction)
+
+This section follows the owner's description of the room and supersedes the "Door position"
+note in the patio section above. Walking in from the hall, the king bed's head is on the left
+(north) wall. The frosted patio door is at the far end of the right (south) wall, and that
+wall has no window. The back (east) wall has glazed sliding doors onto a small covered balcony
+with a timber railing. The balcony occupies the strip where the en-suite used to be. The
+dressing table stands on the right wall, west of the patio door.
+
+From the photo viewpoint this matches `main-bedroom-1` closely: the glazed doors with the
+railing outside are on the left, the frosted door is on the far wall, and the dressing table
+is on the right. The sun deck now extends to x = 17.5 so the patio door opens onto it.
+
+The main en-suite moved into the space behind the braai (≈1.6 × 2.3 m inside). Its door is
+on the bedroom's entrance wall. The bath runs along the lounge-side wall, with a corner
+shower beyond it and the toilet and bidet beside the door. `main-ensuite-1` shows an
+outside window, but this position only meets the outside on the braai wall, and the patio
+photos show none there. So no window is modelled. The bathroom is tighter than the photo
+suggests, and its position is inferred (low–medium confidence).
+
+
+## Bedroom 3 and en-suite 3 (upstairs) rebuilt
+
+The doorway at the far end of the loft's left wall in `loft-1` shows a single bed with its
+head on the far wall and its foot towards the loft. So the beds in bedroom 3 point back at
+the loft door. Combining `bedroom-3-1` and `bedroom-3-2`:
+
+- the beds' heads are on the north wall, under the air-con, with a nightstand between them;
+- the built-in wardrobes are on the left (west) wall, and the en-suite doorway is beside
+  them, nearer the loft;
+- the big window with a timber balcony railing is on the right (east) wall;
+- the dressing table and prints are on the loft-door wall.
+
+The room now spans x 12.6–16.6 (≈3.8 × 3.3 m). The en-suite moved to the west side
+(≈2.0 × 3.2 m): the bath runs along the outside wall, the toilet sits under a frosted
+window in the north wall, the shower is in the corner, and the basin is beside the door.
+The east window is modelled as glazed sliding doors onto a small balcony (≈1 × 2.1 m) on
+the roof of en-suite 2 below. Its size is inferred; the photo only shows the railing
+directly outside. Medium confidence in the arrangement, low in the exact dimensions.

@@ -205,9 +205,11 @@ export function surface(plane, c, u0, u1, y0, y1, holes, mat, parent) {
 // mats: [negativeSideMaterial, positiveSideMaterial]
 export function wall(parent, { along, c, from, to, y0 = 0, y1 = 2.6, t = 0.12, ops = [], mats, collide = true }) {
   const [mNeg, mPos] = mats;
+  // ends and top of an exterior wall take the outside finish, so no white plaster shows outdoors
+  const cap = [mNeg, mPos].find(m => m === M.render || m === M.patioWall) ?? mNeg;
   const faceMats = along === 'x'
-    ? [mNeg, mNeg, mNeg, mNeg, mPos, mNeg]
-    : [mPos, mNeg, mNeg, mNeg, mNeg, mNeg];
+    ? [cap, cap, cap, cap, mPos, mNeg]
+    : [mPos, mNeg, cap, cap, cap, cap];
   const piece = (a, b, ya, yb) => {
     if (b - a < 0.005 || yb - ya < 0.005) return;
     const L = b - a, H = yb - ya;

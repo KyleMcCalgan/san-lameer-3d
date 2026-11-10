@@ -16,6 +16,7 @@ export const VAULT_X0 = 4.2;    // the lounge vault starts at the kitchen/dining
 // front door and rising EAST to a landing that opens onto the loft.
 export const STAIR = { axis: 'x', x0: 5.6, x1: 9.35, z0: 0.12, z1: 1.1, risers: 16 };
 export const LANDING = [9.35, 0.12, 10.5, 1.6];
+const L_PASS = [9.35, 0.12, 10.5, 1.6];   // passage under the landing, door on its south side
 
 const P = 'assets/references/';
 
@@ -24,11 +25,11 @@ export const rooms = [
   {
     id: 'living', name: 'Living Room', level: 'G', evidence: 'photographed',
     rects: [[5.7, 3.4, 10.5, 11.0], [3.6, 0, 10.5, 3.4]],
-    spawn: [10.25, 8.2, 64],
+    spawn: [10.3, 7.6, 70],
     photos: [
-      { src: P + 'living/living-1.jpg', caption: 'Lounge from the patio opening: sofa, kitchen and dining beyond, stairs to the right', view: [10.25, 1.45, 8.2, 64, 3] },
+      { src: P + 'living/living-1.jpg', caption: 'Lounge from the patio opening: sofa, kitchen and dining beyond, stairs to the right', view: [10.3, 1.45, 7.6, 70, 3] },
       { src: P + 'living/living-2.jpg', caption: 'Lounge towards the TV wall and the wide patio doors', view: [7.4, 1.45, 4.6, -150, -3] },
-      { src: P + 'patio/patio-1.jpg', caption: 'Looking in from the patio', view: [10.9, 1.5, 10.6, -25, 0] },
+      { src: P + 'patio/patio-1.jpg', caption: 'Looking in from the patio', view: [13.6, 1.5, 10.5, 22, 2] },
     ],
   },
   {
@@ -53,7 +54,7 @@ export const rooms = [
     rects: [[4.2, 0, 5.6, 2.2]],
     spawn: [4.95, 0.6, 180],
     photos: [
-      { src: P + 'living/living-1.jpg', caption: 'Front door (centre) right beside the foot of the stairs', view: [10.25, 1.45, 8.2, 64, 3] },
+      { src: P + 'living/living-1.jpg', caption: 'Front door (centre) right beside the foot of the stairs', view: [10.3, 1.45, 7.6, 70, 3] },
     ],
   },
   {
@@ -61,51 +62,51 @@ export const rooms = [
     rects: [[STAIR.x0, STAIR.z0, STAIR.x1, STAIR.z1]],
     spawn: [5.1, 0.62, -90],
     photos: [
-      { src: P + 'living/living-1.jpg', caption: 'Timber staircase rising along the front wall to the loft', view: [10.25, 1.45, 8.2, 64, 3] },
+      { src: P + 'living/living-1.jpg', caption: 'Timber staircase rising along the front wall to the loft', view: [10.3, 1.45, 7.6, 70, 3] },
     ],
   },
   {
     id: 'patio', short: 'Patio & Braai', name: 'Patio & Braai', level: 'G', evidence: 'photographed',
-    rects: [[10.5, 5.0, 16.0, 11.0]],
-    spawn: [11.0, 6.0, -100],
+    rects: [[10.5, 5.0, 17.5, 11.0]],
+    spawn: [11.2, 10.3, -12],
     photos: [
-      { src: P + 'patio/patio-1.jpg', caption: 'Patio table, built-in braai and door to the main bedroom', view: [10.9, 1.5, 10.6, -25, 0] },
-      { src: P + 'patio/patio-2.jpg', caption: 'Braai, door and railing looking east', view: [11.0, 1.5, 6.0, -100, -4] },
-      { src: P + 'patio/patio-3.jpg', caption: 'Loungers along the garden railing', view: [15.2, 1.5, 6.5, 145, -12] },
+      { src: P + 'patio/patio-1.jpg', caption: 'Lounge sliders under the tall raked ceiling; braai, shelves and bedroom door on the end wall', view: [13.6, 1.5, 10.5, 22, 2] },
+      { src: P + 'patio/patio-2.jpg', caption: 'Braai at the slider corner, shelf niche, pillar and bedroom door; roof falls to the edge beam', view: [11.2, 1.5, 10.3, -12, 2] },
+      { src: P + 'patio/patio-3.jpg', caption: 'Loungers on the open sun deck past the roof edge', view: [16.2, 1.5, 6.0, 165, -10] },
       { src: P + 'garden/garden-1.jpg', caption: 'Lawn and trees below the villa (exact viewpoint unknown)', view: [9.0, GRADE + 1.6, 24, 10, 6] },
     ],
   },
   {
-    id: 'lobby', short: 'Lobby', name: 'Bedroom Lobby', level: 'G', evidence: 'inferred',
-    rects: [[10.5, 1.0, 12.2, 3.0]],
-    spawn: [10.9, 2.2, -90],
-    photos: [],
-  },
-  {
-    id: 'laundry', short: 'Laundry', name: 'Laundry (inferred)', level: 'G', evidence: 'inferred',
-    rects: [[10.5, 3.0, 12.2, 5.0]],
-    spawn: [11.4, 3.4, 180],
+    id: 'lobby', short: 'Hall', name: 'Bedroom Hall', level: 'G', evidence: 'inferred',
+    rects: [[10.5, 0.6, 12.2, 2.5], [L_PASS[0], L_PASS[1], L_PASS[2], L_PASS[3]]],
+    spawn: [11.3, 1.2, 180],
     photos: [],
   },
   {
     id: 'main', name: 'Main Bedroom (King)', level: 'G', evidence: 'photographed',
     rects: [[12.2, 1.0, 17.4, 5.0]],
-    spawn: [12.8, 1.7, -145],
+    spawn: [12.7, 1.75, -90],
     photos: [
-      { src: P + 'main-bedroom/main-bedroom-1.jpg', caption: 'King bed, dressing table, Juliet window and patio door', view: [12.8, 1.5, 1.7, -145, -10] },
+      { src: P + 'main-bedroom/main-bedroom-1.jpg', caption: 'King bed, dressing table, glazed doors to the balcony and the patio door', view: [12.7, 1.5, 1.6, -125, -8] },
     ],
   },
   {
     id: 'ensuite1', short: 'En-suite 1', name: 'Main En-suite', level: 'G', evidence: 'photographed',
-    rects: [[17.4, 1.0, 19.8, 5.0]],
-    spawn: [17.75, 3.0, -95],
+    rects: [[10.5, 2.5, 12.2, 5.0]],
+    spawn: [11.95, 2.95, 110],
     photos: [
-      { src: P + 'main-ensuite/main-ensuite-1.jpg', caption: 'Bath, bidet, toilet and shower', view: [17.75, 1.5, 3.0, -95, -10] },
+      { src: P + 'main-ensuite/main-ensuite-1.jpg', caption: 'Bath, bidet, toilet and shower', view: [12.05, 1.5, 3.05, 115, -15] },
     ],
   },
   {
+    id: 'balcony', short: 'Balcony', name: 'Main Bedroom Balcony', level: 'G', evidence: 'railing seen from the bedroom; extent inferred',
+    rects: [[17.4, 1.0, 19.8, 5.0]],
+    spawn: [18.6, 3.0, -90],
+    photos: [],
+  },
+  {
     id: 'bed2', name: 'Bedroom 2 (Twin)', level: 'G', evidence: 'photographed',
-    rects: [[10.5, -3.4, 15.0, 1.0]],
+    rects: [[10.5, -3.4, 12.2, 0.6], [12.2, -3.4, 15.0, 1.0]],
     spawn: [13.6, 0.55, 12],
     photos: [
       { src: P + 'bedroom-2/bedroom-2-1.jpg', caption: 'Twin beds, dressing table, garden door and window', view: [13.6, 1.5, 0.55, 12, -10] },
@@ -130,19 +131,19 @@ export const rooms = [
   },
   {
     id: 'bed3', short: 'Bedroom 3 (Twin)', name: 'Bedroom 3 (Twin, upstairs)', level: 'U', evidence: 'photographed; position inferred',
-    rects: [[10.5, -3.4, 14.3, 0]],
-    spawn: [11.0, -0.5, -80],
+    rects: [[12.6, -3.4, 16.6, 0], [16.6, -2.7, 17.7, -0.6]],
+    spawn: [13.6, -0.45, 0],
     photos: [
-      { src: P + 'bedroom-3/bedroom-3-1.jpg', caption: 'Twin beds, built-in wardrobes and air-conditioner', view: [11.0, 4.3, -0.5, -80, -8] },
-      { src: P + 'bedroom-3/bedroom-3-2.jpg', caption: 'Window over the trees, dressing table and prints', view: [11.2, 4.3, -0.4, -30, -10] },
+      { src: P + 'bedroom-3/bedroom-3-1.jpg', caption: 'Twin beds pointing back at the loft door, built-in wardrobes and air-conditioner', view: [14.5, 4.3, -0.3, 22, -8] },
+      { src: P + 'bedroom-3/bedroom-3-2.jpg', caption: 'Glazed doors to the balcony, dressing table and prints', view: [13.0, 4.3, -0.75, -70, -8] },
     ],
   },
   {
     id: 'ensuite3', short: 'En-suite 3', name: 'Bedroom 3 En-suite', level: 'U', evidence: 'photographed; position inferred',
-    rects: [[14.3, -3.4, 16.6, 0]],
-    spawn: [14.6, -0.5, -90],
+    rects: [[10.5, -3.4, 12.6, 0]],
+    spawn: [12.2, -0.5, 10],
     photos: [
-      { src: P + 'ensuite-3/ensuite-3-1.jpg', caption: 'Bath, toilet and shower', view: [14.6, 4.3, -0.5, -90, -10] },
+      { src: P + 'ensuite-3/ensuite-3-1.jpg', caption: 'Bath, toilet and shower', view: [12.2, 4.3, -0.5, 10, -12] },
     ],
   },
 ];
@@ -152,7 +153,7 @@ export const outsideRoom = {
   spawn: [9.0, 24, 10],
   photos: [
     { src: P + 'garden/garden-1.jpg', caption: 'Estate lawn and trees (exact viewpoint unknown)', view: [9.0, GRADE + 1.6, 24, 10, 6] },
-    { src: P + 'patio/patio-3.jpg', caption: 'Garden seen from the patio', view: [15.2, 1.5, 6.5, 145, -12] },
+    { src: P + 'patio/patio-3.jpg', caption: 'Garden seen from the sun deck', view: [16.2, 1.5, 6.0, 165, -10] },
   ],
 };
 
@@ -161,12 +162,13 @@ const groundRects = [
   [3.6, 0, 10.5, 11.0],           // entrance, stair, lounge, dining
   [0, 4.1, 3.6, 11.0],            // kitchen
   [10.5, -3.4, 17.4, 1.0],        // bedroom 2 + en-suite 2
-  [10.5, 1.0, 19.8, 5.0],         // lobby, laundry, main bedroom, en-suite 1
-  [10.5, 5.0, 16.0, 11.0],        // patio
+  [10.5, 0.6, 12.2, 5.0],         // bedroom hall + main en-suite
+  [12.2, 1.0, 19.8, 5.0],         // main bedroom, en-suite 1
+  [10.5, 5.0, 17.5, 11.0],        // patio + sun deck
   [4.3, -1.5, 5.6, 0],            // front entrance landing
   [11.0, -4.6, 12.4, -3.4],       // landing outside bedroom 2's garden door
 ];
-const upperRects = [[10.5, -3.4, 16.6, 0], [10.5, 0, 14.3, 5.0], LANDING];
+const upperRects = [[10.5, -3.4, 16.6, 0], [10.5, 0, 14.3, 5.0], LANDING, [16.6, -2.7, 17.7, -0.6]]; // + bedroom 3 balcony
 export const extSteps = [
   { r: [4.4, -2.85, 5.5, -1.5], top: -1.5, bottom: -2.85 },
   { r: [11.15, -5.95, 12.25, -4.6], top: -4.6, bottom: -5.95 },

@@ -10,6 +10,9 @@ let root;
 
 // ---- vertical profile of the vaulted living ceiling and loft ceiling ----
 const yVault = x => CEIL_G + (x - VAULT_X0) * ((RIDGE_Y - CEIL_G) / (RIDGE_X - VAULT_X0)); // lounge: low at the dining side
+// patio: lean-to timber ceiling, high against the lounge wall, falling to an edge beam (patio-1, patio-2)
+const PATIO_E = 14.0, PATIO_HI = 4.0, PATIO_LO = 2.35, DECK_E = 17.5;
+const yPatio = x => PATIO_HI - (x - RIDGE_X) * ((PATIO_HI - PATIO_LO) / (PATIO_E - RIDGE_X));
 const yLoft = x => RIDGE_Y - (x - RIDGE_X) * ((RIDGE_Y - LOFT_WALL_Y) / (14.3 - RIDGE_X)); // loft: low at its east wall
 
 // ---------------------------------------------------------------- openings
@@ -190,7 +193,7 @@ function buildStructure() {
   const y56 = yVault(S.x0);
 
   // ---------- plinth (the villa sits ~0.9 m above the lawn) ----------
-  for (const [x0, z0, x1, z1] of [[3.5, -0.1, 10.5, 11.1], [-0.1, 4.0, 3.6, 11.1], [10.5, -3.5, 17.5, 1.0], [10.5, 1.0, 19.9, 5.0], [10.5, 5.0, 16.1, 11.1]]) {
+  for (const [x0, z0, x1, z1] of [[3.5, -0.1, 10.5, 11.1], [-0.1, 4.0, 3.6, 11.1], [10.5, -3.5, 17.5, 1.0], [10.5, 1.0, 19.9, 5.0], [10.5, 5.0, DECK_E + 0.1, 11.1]]) {
     bmm(x0, GRADE, z0, x1, -0.01, z1, M.plinth, root);
     addCollider(x0, x1, GRADE - 0.5, 0, z0, z1);
   }
@@ -199,19 +202,21 @@ function buildStructure() {
   hRect(3.6, 0, 10.5, 11, 0, M.floorTile, root);                // entrance, dining, lounge
   hRect(0, 4.1, 3.6, 11, 0, M.floorTile, root);                 // kitchen
   bmm(5.75, 0, 3.3, 10.4, 0.012, 10.9, M.carpet, root);         // fitted lounge carpet
-  hRect(10.5, 1.0, 12.2, 5.0, 0, M.floorTile, root);            // lobby + laundry
+  hRect(10.5, 0.6, 12.2, 2.5, 0, M.floorTile, root);            // bedroom hall
   hRect(12.2, 1.0, 17.4, 5.0, 0, M.woodTileDark, root);         // main bedroom
-  hRect(17.4, 1.0, 19.8, 5.0, 0, M.bathFloor, root);            // en-suite 1
-  hRect(10.5, -3.4, 15.0, 1.0, 0, M.woodTileDark, root);        // bedroom 2
+  hRect(17.4, 1.0, 19.8, 5.0, 0, M.terracotta, root);           // main-bedroom balcony
+  hRect(10.5, 2.5, 12.2, 5.0, 0, M.bathFloor, root);            // en-suite 1 (behind the braai)
+  hRect(10.5, -3.4, 12.2, 0.6, 0, M.woodTileDark, root);        // bedroom 2
+  hRect(12.2, -3.4, 15.0, 1.0, 0, M.woodTileDark, root);
   hRect(15.0, -3.4, 17.4, 1.0, 0, M.bathFloor, root);           // en-suite 2
-  hRect(10.5, 5.0, 16.0, 11.0, 0, M.terracotta, root);          // patio
+  hRect(10.5, 5.0, DECK_E, 11.0, 0, M.terracotta, root);         // patio + sun deck
 
   // ---------- flat ceilings ----------
   hRect(0, 4.1, VAULT_X0, 11, CEIL_G, M.woodCeil, root, true);   // kitchen + dining (low flat timber)
   hRect(3.6, 0, VAULT_X0, 4.1, CEIL_G, M.woodCeil, root, true);
   hRect(VAULT_X0, 0, S.x0, 2.2, CEIL_G, M.woodCeil, root, true); // entrance hall
-  hRect(10.5, -3.4, 19.8, 5.0, CEIL_G, M.ceilWhite, root, true); // bedroom wing
-  hRect(10.5, 5.0, 16.0, 11.0, CEIL_G, M.woodCeil, root, true);  // patio
+  hRect(10.5, -3.4, 17.4, 5.0, CEIL_G, M.ceilWhite, root, true); // bedroom wing
+  hRect(17.4, 1.0, 19.8, 5.0, CEIL_G, M.ceilWhite, root, true);  // balcony soffit
 
   // ---------- open plan: kitchen / dining / lounge ----------
   W({ along: 'x', c: 0, from: 3.5, to: 10.5, t: EXT, mats: [rn, wl], ops: [
@@ -223,9 +228,10 @@ function buildStructure() {
   W({ along: 'x', c: 11, from: -0.1, to: 10.6, t: EXT, mats: [wl, rn] });                  // flat south wall: kitchen, dining, TV
   // closed space under the stair landing
   W({ along: 'z', c: L[0], from: S.z1, to: L[3] });
-  W({ along: 'x', c: L[3], from: L[0], to: R });
-  // east side of the lounge: lobby doorway, then the wide patio sliders
-  W({ along: 'z', c: R, from: 0, to: 5.0, ops: [{ a: 1.75, b: 2.65, y0: 0, y1: 2.1, kind: 'open' }] });
+  // door under the landing (living-1, far right) into a short passage that turns east to the bedroom hall
+  W({ along: 'x', c: L[3], from: L[0], to: R, ops: [{ a: 9.45, b: 10.4, y0: 0, y1: 2.05, kind: 'door', style: 'white', hinge: 'a', swing: -1 }] });
+  // east side of the lounge: solid below the loft, then the wide patio sliders
+  W({ along: 'z', c: R, from: 0, to: 5.0, ops: [{ a: 0.6, b: 1.6, y0: 0, y1: 2.3, kind: 'open' }] });   // passage opens full width into the hall
   W({ along: 'z', c: R, from: 5.0, to: 11.0, t: EXT, mats: [wl, pw], ops: [{ a: 5.3, b: 10.7, y0: 0, y1: 2.35, kind: 'slide' }] });
 
   // ---------- bedroom wing ----------
@@ -235,17 +241,17 @@ function buildStructure() {
     { a: 15.6, b: 16.6, y0: 1.3, y1: 2.1, kind: 'window', frosted: true }] });                // en-suite 2
   W({ along: 'z', c: 10.5, from: -3.4, to: 0, t: EXT, mats: [rn, wl] });
   W({ along: 'z', c: 17.4, from: -3.4, to: 1.0, t: EXT, mats: [wl, rn] });
-  W({ along: 'x', c: 1.0, from: 10.5, to: 17.4, ops: [{ a: 10.9, b: 11.7, y0: 0, y1: 2.05, kind: 'door', style: 'white', hinge: 'b', swing: -1 }] });
-  W({ along: 'x', c: 1.0, from: 17.3, to: 19.9, t: EXT, mats: [rn, wl] });
+  W({ along: 'x', c: 0.6, from: 10.5, to: 12.26, ops: [{ a: 11.2, b: 12.0, y0: 0, y1: 2.05, kind: 'door', style: 'white', hinge: 'b', swing: -1 }] });
+  W({ along: 'z', c: 12.2, from: 0.6, to: 1.0 });
+  W({ along: 'x', c: 1.0, from: 12.2, to: 17.4 });
+  W({ along: 'x', c: 2.5, from: 10.5, to: 12.2 });                                         // hall ends just past the main-bedroom door
   W({ along: 'z', c: 15.0, from: -3.4, to: 1.0, ops: [{ a: -0.2, b: 0.6, y0: 0, y1: 2.05, kind: 'door', style: 'frosted', hinge: 'b', swing: 1 }] });
-  W({ along: 'z', c: 12.2, from: 1.0, to: 5.0, ops: [{ a: 1.4, b: 2.15, y0: 0, y1: 2.05, kind: 'door', style: 'white', hinge: 'a', swing: 1 }] });
-  W({ along: 'x', c: 3.0, from: 10.5, to: 12.2, ops: [{ a: 10.85, b: 11.95, y0: 0, y1: 2.05, kind: 'open' }] });
-  W({ along: 'z', c: 17.4, from: 1.0, to: 5.0, ops: [{ a: 3.9, b: 4.75, y0: 0, y1: 2.05, kind: 'open' }] });
-  W({ along: 'z', c: 19.8, from: 0.9, to: 5.1, t: EXT, mats: [wl, rn], ops: [
-    { a: 3.0, b: 4.0, y0: 1.3, y1: 2.1, kind: 'window', frosted: true }] });                // en-suite 1
-  W({ along: 'x', c: 5.0, from: 10.5, to: 19.9, t: EXT, mats: [wl, pw], ops: [
-    { a: 14.7, b: 15.5, y0: 0, y1: 2.1, kind: 'door', style: 'frosted', hinge: 'a', swing: -1 }, // patio door
-    { a: 16.3, b: 17.2, y0: 0.5, y1: 2.2, kind: 'window' }] });                             // Juliet window past the patio
+  W({ along: 'z', c: 12.2, from: 1.0, to: 5.0, ops: [
+    { a: 1.4, b: 2.15, y0: 0, y1: 2.05, kind: 'door', style: 'white', hinge: 'a', swing: 1 },   // from the hall
+    { a: 2.7, b: 3.45, y0: 0, y1: 2.05, kind: 'door', style: 'white', hinge: 'a', swing: 1 }] }); // to the en-suite
+  W({ along: 'z', c: 17.4, from: 0.9, to: 5.1, t: EXT, mats: [wl, rn], ops: [{ a: 2.2, b: 4.3, y0: 0, y1: 2.2, kind: 'slide' }] }); // glazed doors onto the balcony
+  W({ along: 'x', c: 5.0, from: 10.5, to: 17.5, t: EXT, mats: [wl, pw], ops: [
+    { a: 16.35, b: 17.15, y0: 0, y1: 2.1, kind: 'door', style: 'frosted', hinge: 'a', swing: -1 }] }); // patio door at the far end of the bedroom
 
   // ---------- vaulted lounge (ridge along x = 10.5 over the loft edge) ----------
   quad([VAULT_X0, CEIL_G, 0], [R, v, 0], [R, v, 11], [VAULT_X0, CEIL_G, 11], M.woodCeil, root);
@@ -281,7 +287,7 @@ function buildStructure() {
   addCollider(L[0] - 0.06, L[0] + 0.06, -0.5, UPPER + 1.2, S.z1, L[3]);
   addCollider(L[0], R, CEIL_G, UPPER + 1.2, L[3] - 0.06, L[3] + 0.06);
 
-  // ---------- loft (mezzanine over the lobby / laundry, open to the lounge) ----------
+  // ---------- loft (mezzanine over the bedroom hall, open to the lounge) ----------
   hRect(R, 0, LOFT_E, 5.0, UPPER, M.woodFloorRed, root);
   bmm(R - 0.06, CEIL_G, L[3], R + 0.06, UPPER, 5.0, M.timber, root);                       // floor edge
   quad([R, v, 0], [LOFT_E, LOFT_WALL_Y, 0], [LOFT_E, LOFT_WALL_Y, 5.0], [R, v, 5.0], M.woodCeil, root);
@@ -295,38 +301,89 @@ function buildStructure() {
   vPoly('z', 5.07, [[R, CEIL_G], [LOFT_E + 0.1, CEIL_G], [LOFT_E + 0.1, LOFT_WALL_Y], [R, v]], rn, root);
   addCollider(R, LOFT_E, UPPER, LOFT_WALL_Y, 4.88, 5.1);
 
-  // ---------- upstairs: bedroom 3 + en-suite 3 (north of the loft) ----------
-  hRect(10.5, -3.4, LOFT_E, 0, UPPER, M.woodTileDark, root);
-  hRect(LOFT_E, -3.4, 16.6, 0, UPPER, M.bathFloor, root);
+  // ---------- upstairs: en-suite 3 (west) + bedroom 3 (east), north of the loft ----------
+  // From the loft door the beds point straight back at you (loft-1); wardrobes and the
+  // en-suite door are on the left, the big window and balcony on the right (bedroom-3-1/2).
+  const B3W = 12.6;
+  hRect(10.5, -3.4, B3W, 0, UPPER, M.bathFloor, root);
+  hRect(B3W, -3.4, 16.6, 0, UPPER, M.woodTileDark, root);
   hRect(10.5, -3.4, 16.6, 0, LOFT_WALL_Y, M.ceilWhite, root, true);
   W({ along: 'x', c: -3.4, from: 10.4, to: 16.7, y0: CEIL_G, y1: LOFT_WALL_Y, t: EXT, mats: [rn, wl], ops: [
-    { a: 12.4, b: 13.9, y0: 0.7, y1: 2.4, kind: 'window' },
-    { a: 15.0, b: 16.0, y0: 1.5, y1: 2.3, kind: 'window', frosted: true }] });
+    { a: 10.75, b: 11.65, y0: 1.6, y1: 2.4, kind: 'window', frosted: true }] });             // en-suite 3, over the toilet
   W({ along: 'z', c: 10.5, from: -3.4, to: 0, y0: CEIL_G, y1: LOFT_WALL_Y, t: EXT, mats: [rn, wl] });
-  W({ along: 'z', c: 16.6, from: -3.4, to: 0.1, y0: CEIL_G, y1: LOFT_WALL_Y, t: EXT, mats: [wl, rn] });
+  W({ along: 'z', c: 16.6, from: -3.4, to: 0.1, y0: CEIL_G, y1: LOFT_WALL_Y, t: EXT, mats: [wl, rn], ops: [
+    { a: -2.35, b: -0.95, y0: UPPER - CEIL_G, y1: UPPER - CEIL_G + 2.1, kind: 'slide' }] });            // bedroom 3 glazed doors to the balcony
   W({ along: 'x', c: 0, from: LOFT_E, to: 16.7, y0: CEIL_G, y1: LOFT_WALL_Y, t: EXT, mats: [wl, rn] });
   W({ along: 'x', c: 0, from: 10.5, to: LOFT_E, y0: UPPER, y1: LOFT_WALL_Y, ops: [
     { a: 13.2, b: 14.0, y0: 0, y1: 2.05, kind: 'door', style: 'white', hinge: 'b', swing: 1 }] });
   vPoly('z', 0, [[R, LOFT_WALL_Y], [LOFT_E, LOFT_WALL_Y], [R, v]], wl, root);
-  W({ along: 'z', c: LOFT_E, from: -3.4, to: 0, y0: UPPER, y1: LOFT_WALL_Y, ops: [
-    { a: -0.9, b: -0.15, y0: 0, y1: 2.05, kind: 'door', style: 'frosted', hinge: 'b', swing: 1 }] });
+  W({ along: 'z', c: B3W, from: -3.4, to: 0, y0: UPPER, y1: LOFT_WALL_Y, ops: [
+    { a: -0.9, b: -0.15, y0: 0, y1: 2.05, kind: 'door', style: 'frosted', hinge: 'b', swing: -1 }] });
+  // small balcony off bedroom 3, sitting on the en-suite 2 roof (railing seen in bedroom-3-2)
+  bmm(16.7, CEIL_G + 0.2, -2.75, 17.75, UPPER + 0.06, -0.55, M.terracotta, root);
+  railing(17.75, -2.75, 17.75, -0.55, UPPER + 0.06, 1.0, 'plain');
+  railing(16.7, -2.75, 17.75, -2.75, UPPER + 0.06, 1.0, 'plain');
+  railing(16.7, -0.55, 17.75, -0.55, UPPER + 0.06, 1.0, 'plain');
 
   // ---------- bathroom tiling + kitchen splashback ----------
-  tileRoom(17.46, 1.06, 19.7, 4.9, 0, CEIL_G, {
-    w: [{ a: 3.9, b: 4.75, y0: 0, y1: 2.05 }], e: [{ a: 3.0, b: 4.0, y0: 1.3, y1: 2.1 }] });
+  tileRoom(10.56, 2.56, 12.14, 4.9, 0, CEIL_G, { e: [{ a: 2.7, b: 3.45, y0: 0, y1: 2.05 }] });
   tileRoom(15.06, -3.3, 17.3, 0.94, 0, CEIL_G, {
     n: [{ a: 15.6, b: 16.6, y0: 1.3, y1: 2.1 }], w: [{ a: -0.2, b: 0.6, y0: 0, y1: 2.05 }] });
-  tileRoom(LOFT_E + 0.06, -3.3, 16.5, -0.1, UPPER, LOFT_WALL_Y, {
-    n: [{ a: 15.0, b: 16.0, y0: CEIL_G + 1.5, y1: CEIL_G + 2.3 }], w: [{ a: -0.9, b: -0.15, y0: UPPER, y1: UPPER + 2.05 }] });
+  tileRoom(10.56, -3.3, 12.54, -0.06, UPPER, LOFT_WALL_Y, {
+    n: [{ a: 10.75, b: 11.65, y0: CEIL_G + 1.6, y1: CEIL_G + 2.4 }], e: [{ a: -0.9, b: -0.15, y0: UPPER, y1: UPPER + 2.05 }] });
   surface('x', 0.102, 4.2, 10.9, 0.9, 1.5, [], M.splash, root);                                    // far wall, between counter and cupboards
   surface('z', 4.202, 0.1, 3.0, 0.9, 1.5, [], M.splash, root);                                       // oven-run wall
 
   // ---------- patio ----------
-  railing(R + 0.1, 11.0, 16.0, 11.0, 0);
-  railing(16.0, 5.1, 16.0, 11.0, 0);
-  for (const [x, z] of [[15.88, 10.88], [15.88, 5.15]]) bmm(x - 0.12, 0, z - 0.12, x + 0.12, CEIL_G, z + 0.12, pw, root);
-  bmm(R, CEIL_G - 0.26, 10.8, 16.0, CEIL_G, 11.02, M.timberDark, root);
-  bmm(15.78, CEIL_G - 0.26, 5.0, 16.0, CEIL_G, 11.02, M.timberDark, root);
+  // Covered braai area under a lean-to (x = R .. PATIO_E), then an open sun deck to DECK_E (patio-3).
+  const yP = yPatio, xw = R + 0.1, bz = 5.1, yX = RIDGE_X + (PATIO_HI - CEIL_G) / ((PATIO_HI - PATIO_LO) / (PATIO_E - RIDGE_X));
+  quad([xw, yP(xw), bz], [PATIO_E, PATIO_LO, bz], [PATIO_E, PATIO_LO, 11.0], [xw, yP(xw), 11.0], M.woodCeil, root);
+  vPoly('x', xw + 0.005, [[bz, CEIL_G], [11.0, CEIL_G], [11.0, yP(xw)], [bz, yP(xw)]], pw, root);   // tall wall over the sliders
+  vPoly('z', bz + 0.005, [[xw, CEIL_G], [yX, CEIL_G], [xw, yP(xw)]], pw, root);                     // braai wall up to the rake
+  bmm(PATIO_E - 0.11, PATIO_LO - 0.28, bz, PATIO_E + 0.11, PATIO_LO + 0.02, 11.05, M.timberDark, root); // edge beam
+  quad([xw, yP(xw) - 0.22, 11.06], [PATIO_E + 0.4, PATIO_LO - 0.42, 11.06], [PATIO_E + 0.4, PATIO_LO - 0.02, 11.06], [xw, yP(xw) + 0.22, 11.06], M.timberDark, root); // raked fascia
+  bmm(PATIO_E - 0.16, 0, 10.72, PATIO_E + 0.16, PATIO_LO - 0.28, 11.04, pw, root);               // rendered corner pillar
+  bmm(PATIO_E + 0.22, 0, 10.88, PATIO_E + 0.3, PATIO_LO - 0.28, 10.96, M.timberDark, root);     // timber post beside it
+  addCollider(PATIO_E - 0.16, PATIO_E + 0.3, 0, PATIO_LO, 10.72, 11.04);
+  railing(xw, 11.0, DECK_E, 11.0, 0);
+  railing(DECK_E, bz, DECK_E, 11.0, 0);
+
+  // Braai wall (patio-1, patio-2), from the slider corner: chimney breast with braai over a
+  // wood store, tiled shelf niche, rendered pillar, then the frosted door to the main bedroom.
+  const t = M.terracotta, pm = pw.clone();
+  pm.color.multiplyScalar(0.9);                                   // projecting masonry reads a shade deeper in shadow
+  bmm(10.6, 0, bz, 10.72, 1.5, 5.7, pm, root);                    // breast jambs
+  bmm(11.53, 0, bz, 11.65, 1.5, 5.7, pm, root);
+  bmm(10.72, 0, bz, 11.53, 0.72, 5.32, pm, root);                 // back of the wood store
+  bmm(10.58, 0.72, bz, 11.67, 0.8, 5.78, t, root);                // tiled ledge
+  bmm(10.72, 0.8, bz, 11.53, 1.5, 5.3, M.black, root);            // firebox
+  bmm(10.72, 0.8, 5.3, 10.75, 1.5, 5.7, M.black, root);
+  bmm(11.5, 0.8, 5.3, 11.53, 1.5, 5.7, M.black, root);
+  bmm(10.78, 0.98, 5.32, 11.47, 1.0, 5.66, M.steel, root);        // grid
+  bmm(10.78, 0.86, 5.64, 11.47, 0.9, 5.68, M.steel, root);        // front rail
+  bmm(10.6, 1.5, bz, 11.65, 4.9, 5.7, pm, root);                  // breast up through the roof as the chimney
+  cyl(0.06, 0.06, 0.02, M.black, 11.12, 2.2, 5.71, root).rotation.x = Math.PI / 2; // vent
+  addCollider(10.6, 11.65, 0, 4.9, 5.0, 5.78);
+  bmm(11.65, 0, bz, 12.25, 0.85, 5.45, pm, root);                 // niche base
+  bmm(11.65, 0.85, bz, 12.25, 0.92, 5.5, t, root);                // tiled counter
+  for (const y of [1.32, 1.72]) bmm(11.65, y, bz, 12.25, y + 0.05, 5.42, t, root);
+  bmm(11.9, 1.06, bz, 11.98, 1.14, bz + 0.015, M.porcelain, root); // plug point
+  addCollider(11.65, 12.25, 0, 0.92, 5.0, 5.5);
+  bmm(12.25, 0, bz, 12.5, 2.3, 5.6, pm, root);                    // pillar
+  addCollider(12.25, 12.5, 0, 2.3, 5.0, 5.6);
+  // terracotta tile skirting along every face of the braai wall (patio-1, patio-2)
+  for (const [x0, z0, x1, z1] of [[10.6, 5.7, 11.65, 5.73], [11.65, 5.45, 12.25, 5.48], [12.25, 5.6, 12.5, 5.63],
+    [11.65, 5.45, 11.68, 5.7], [12.22, 5.45, 12.25, 5.6], [12.5, bz, 12.53, 5.6], [12.5, bz, 12.6, bz + 0.03], [13.4, bz, PATIO_E, bz + 0.03],
+    [xw, bz, xw + 0.03, 5.3], [xw, 10.7, xw + 0.03, 11.0]]) bmm(x0, 0, z0, x1, 0.09, z1, t, root);
+
+  // ---------- main-bedroom balcony (where the old en-suite was) ----------
+  railing(17.5, 1.0, 19.8, 1.0, 0, 1.0, 'plain');
+  railing(19.8, 1.0, 19.8, 5.0, 0, 1.0, 'plain');
+  railing(17.5, 5.0, 19.8, 5.0, 0, 1.0, 'plain');
+  for (const z of [1.08, 4.92]) bmm(19.66, 0, z - 0.08, 19.82, CEIL_G, z + 0.08, M.timberDark, root);
+  bmm(17.5, CEIL_G - 0.2, 0.95, 19.85, CEIL_G, 1.05, M.timberDark, root);
+  bmm(17.5, CEIL_G - 0.2, 4.95, 19.85, CEIL_G, 5.05, M.timberDark, root);
+  bmm(19.7, CEIL_G - 0.2, 0.95, 19.85, CEIL_G, 5.05, M.timberDark, root);
 
   // ---------- entrance landings & exterior stairs ----------
   bmm(4.3, GRADE, -1.5, 5.6, 0, 0, M.terracotta, root);
@@ -351,8 +408,10 @@ function buildStructure() {
   bmm(16.6, CEIL_G + 0.03, -3.65, 17.65, CEIL_G + 0.25, 1.0, M.roof, root);
   bmm(LOFT_E + 0.06, CEIL_G + 0.03, 0.06, 16.6, CEIL_G + 0.25, 1.0, M.roof, root);
   bmm(LOFT_E + 0.06, CEIL_G + 0.03, 1.0, 20.05, CEIL_G + 0.25, 5.2, M.roof, root);
-  bmm(R + 0.12, CEIL_G + 0.03, 5.12, 16.2, CEIL_G + 0.22, 11.25, M.roof, root);
-  bmm(13.1, CEIL_G, 5.1, 14.0, 3.5, 5.7, rn, root);                                         // braai chimney
+  { // lean-to over the patio, falling from the lounge wall to just past the edge beam
+    const yr = x => yPatio(x) + 0.2, xe = PATIO_E + 0.4;
+    quad([R + 0.1, yr(R + 0.1), 4.95], [xe, yr(xe), 4.95], [xe, yr(xe), 11.3], [R + 0.1, yr(R + 0.1), 11.3], M.roof, root);
+  }
 }
 
 // ---------------------------------------------------------------- furnishing
@@ -417,15 +476,18 @@ function furnish() {
   // 3-seater on the dining side facing the patio glass, two recliners on the
   // stair side angled in towards the table, 2-seater backed onto the glass
   // near the TV corner.
-  P(F.sofa(2.2), 6.55, 0, 7.9, FACE.E);
-  P(F.recliner(), 7.75, 0, 6.15, FACE.S + 0.3);
-  P(F.recliner(), 8.95, 0, 6.3, FACE.S - 0.15);
-  P(F.coffeeTable(1.2, 0.8), 8.0, 0, 7.95, FACE.E);
-  P(F.tvUnit(), 7.9, 0, 10.67, FACE.N);
-  P(F.sofa(1.65, M.tropical, 2), 9.85, 0, 9.6, -2.28);
+  // 3-seater on the dining side facing the glass, 2-seater in front of the glass
+  // (fully inside the room, angled slightly at the table), two recliners side by
+  // side on the stair side facing the TV, coffee table centred in the U (living-2).
+  P(F.sofa(2.2), 6.4, 0, 8.25, FACE.E);
+  P(F.sofa(1.65, M.tropical, 2), 9.8, 0, 9.2, FACE.W - 0.12);
+  P(F.recliner(), 7.5, 0, 6.35, FACE.S + 0.12);
+  P(F.recliner(), 8.75, 0, 6.35, FACE.S - 0.12);
+  P(F.coffeeTable(1.2, 0.8), 8.1, 0, 8.35, FACE.S);
+  P(F.tvUnit(), 8.1, 0, 10.67, FACE.N);
   onWall(F.painting(0.9, 0.6, M.birds, M.timberDark), 'x', S_Z1(), 8.4, 1.3, 1, 0.03);
-  onWall(F.curtains(0.3, 2.4, 2.4), 'z', RIDGE_X, 4.95, 0, -1, 0.11);
-  onWall(F.curtains(0.3, 2.4, 2.4), 'z', RIDGE_X, 10.85, 0, -1, 0.11);
+  onWall(F.curtains(0.3, 2.4, 2.4), 'z', RIDGE_X, 5.4, 0, -1, 0.11);
+  onWall(F.curtains(0.3, 2.4, 2.4), 'z', RIDGE_X, 10.48, 0, -1, 0.11); // stays inside the TV-corner wall
 
   const fan = F.ceilingFan(); fan.position.set(6.5, yVault(6.5), 8.6); root.add(fan);
   onWall(F.trackLight(), 'x', 6.0, 8.0, yVault(8.0), 1, 0, false);
@@ -433,46 +495,35 @@ function furnish() {
   // ---------- patio (photos 7, 8 & 14) ----------
   // Table runs from the glass corner towards the braai wall (photo 7), benches
   // either side, chairs at the ends; loungers along the far railing (photo 14).
-  P(F.patioTable(2.6), 12.4, 0, 7.75, FACE.E);
-  P(F.bench(2.4), 11.67, 0, 7.75, FACE.E);
-  P(F.bench(2.4), 13.13, 0, 7.75, FACE.E);
-  P(F.diningChair(), 12.4, 0, 6.0, FACE.S, false);
-  P(F.diningChair(), 12.4, 0, 9.5, FACE.N, false);
-  for (const x of [13.9, 14.65, 15.4]) P(F.lounger(), x, 0, 9.95, FACE.N);
-  // built-in braai with shelves on the patio's north wall, just left of the bedroom door
-  bmm(13.1, 0, 5.1, 14.0, 0.75, 5.7, pwM(), root);
-  bmm(13.05, 0.72, 5.1, 14.05, 0.8, 5.75, M.terracotta, root);
-  bmm(13.2, 0.8, 5.1, 13.9, 1.4, 5.7, M.black, root);
-  bmm(13.2, 0.95, 5.6, 13.9, 0.98, 5.7, M.steel, root);
-  bmm(13.05, 1.4, 5.1, 14.05, CEIL_G, 5.75, pwM(), root);
-  addCollider(13.05, 14.05, 0, CEIL_G, 5.0, 5.75);
-  bmm(14.05, 0, 5.1, 14.45, CEIL_G, 5.55, pwM(), root);
-  for (const y of [0.6, 1.2, 1.7]) bmm(14.1, y, 5.55, 14.45, y + 0.05, 5.7, M.terracotta, root);
-  addCollider(14.05, 14.45, 0, CEIL_G, 5.0, 5.7);
+  P(F.patioTable(2.6), 12.4, 0, 7.85, FACE.E);
+  P(F.bench(2.4), 11.67, 0, 7.85, FACE.E);
+  P(F.bench(2.4), 13.13, 0, 7.85, FACE.E);
+  P(F.diningChair(), 12.4, 0, 6.15, FACE.S, false);
+  P(F.diningChair(), 12.4, 0, 9.55, FACE.N, false);
+  for (const x of [15.0, 15.8, 16.6]) P(F.lounger(), x, 0, 9.9, FACE.N); // in the sun past the roof edge (patio-3)
 
   // ---------- main bedroom (photo 2) ----------
-  P(F.kingBed(), 16.25, 0, 2.1, FACE.W);
-  P(F.nightstand(), 17.05, 0, 1.0 + 0.25, FACE.W);
-  P(F.nightstand(), 17.05, 0, 3.35, FACE.W);
-  P(F.dressingTable(1.5), 12.52, 0, 3.75, FACE.E);
-  P(F.tubChair(), 15.95, 0, 4.5, FACE.N + 0.5);
-  onWall(F.curtains(0.9, 2.25), 'x', 5.0, 16.75, 0, -1, 0.11);
-  onWall(F.julietRail(0.9), 'x', 5.0, 16.75, 0.35, 1, 0.16);
-  onWall(F.painting(0.4, 0.5, M.tropical), 'x', 5.0, 13.4, 1.6, -1, 0.11);
-  onWall(F.airCon(), 'z', 17.4, 2.1, 2.25, -1, 0.17);
+  // Entering from the hall: bed head on the left (north) wall, patio door at the far end of the
+  // right wall, glazed doors to the balcony on the back wall.
+  P(F.kingBed(), 15.05, 0, 2.12, FACE.S);
+  P(F.nightstand(), 13.8, 0, 1.3, FACE.S);
+  P(F.nightstand(), 16.3, 0, 1.3, FACE.S);
+  P(F.dressingTable(1.5), 13.9, 0, 4.64, FACE.N);
+  P(F.tubChair(), 12.8, 0, 4.4, FACE.N + 0.6);
+  onWall(F.curtains(2.1, 2.25), 'z', 17.4, 3.25, 0, -1, 0.11);
+  onWall(F.painting(0.4, 0.5, M.tropical), 'z', 12.2, 4.3, 1.5, 1, 0.07);
+  onWall(F.airCon(), 'x', 1.0, 16.75, 2.25, 1, 0.07);
   onWall(F.trackLight(), 'x', 3.0, 14.6, CEIL_G, 1, 0, false);
 
   // ---------- main en-suite (photo 3) ----------
-  P(F.bathtub(1.75), 18.65, 0, 1.48, 0);
-  P(F.bidet(), 19.45, 0, 2.95, FACE.W);
-  P(F.toilet(), 19.4, 0, 3.6, FACE.W);
-  showerAt(18.9, 4.1, 19.74, 4.94, 0, ['x0', 'z0']);
-  P(F.basin(), 18.1, 0, 2.15, FACE.E);
-  P(F.bin(), 19.45, 0, 2.3, 0, false);
+  // tucked behind the braai: bath along the lounge-side wall, shower in the far corner,
+  // toilet and bidet beside the door
+  P(F.bathtub(1.45), 10.98, 0, 3.34, Math.PI / 2);
+  showerAt(10.56, 4.12, 11.4, 4.9, 0, ['x1', 'z0']);
+  P(F.toilet(), 11.8, 0, 4.58, FACE.N);
+  P(F.bidet(), 11.88, 0, 3.85, FACE.W);
+  P(F.bin(), 11.95, 0, 4.15, 0, false);
 
-  // ---------- lobby + laundry (inferred) ----------
-  P(F.washer(), 10.95, 0, 4.62, FACE.N);
-  P(F.washer(true), 11.6, 0, 4.62, FACE.N);
   onWall(F.trackLight(), 'x', 2.0, 11.35, CEIL_G, 1, 0, false);
 
   // ---------- bedroom 2 (photo 10) ----------
@@ -481,7 +532,7 @@ function furnish() {
   P(F.nightstand(), 14.7, 0, -1.85, FACE.W);
   P(F.dressingTable(1.1), 10.82, 0, -1.4, FACE.E);
   P(F.tubChair(), 12.25, 0, -2.95, FACE.S + 0.4);
-  bmm(10.65, 0, 0.3, 10.95, 0.3, 0.6, M.basket, root);
+  bmm(10.65, 0, 0.0, 10.95, 0.3, 0.3, M.basket, root);
   onWall(F.curtains(1.5, 2.3), 'x', -3.4, 13.25, 0, 1, 0.11);
   onWall(F.julietRail(1.5), 'x', -3.4, 13.25, 0.35, -1, 0.16);
   onWall(F.painting(0.55, 0.45, M.monstera), 'z', 10.5, -2.6, 1.65, 1, 0.11);
@@ -509,23 +560,25 @@ function furnish() {
   const lfan = F.ceilingFan(); lfan.position.set(12.2, yLoft(12.2), 2.8); root.add(lfan);
 
   // ---------- bedroom 3, upstairs (photos 15 & 16) ----------
-  P(F.singleBed(), 13.3, U, -2.7, FACE.W);
-  P(F.singleBed(), 13.3, U, -1.35, FACE.W);
-  P(F.nightstand(), 14.05, U, -2.03, FACE.W);
-  P(F.wardrobe(1.3, 2.25), 11.3, U, -2.98, FACE.S);
-  P(F.dressingTable(0.9, 'small'), 11.3, U, -0.3, FACE.N);
-  onWall(F.airCon(), 'z', LOFT_E, -2.03, U + 2.05, -1, 0.17);
-  onWall(F.curtains(1.5, U + 2.45, 2.2), 'x', -3.4, 13.15, 0, 1, 0.11);
-  onWall(F.julietRail(1.5), 'x', -3.4, 13.15, U + 0.5, -1, 0.16);
-  onWall(F.painting(0.5, 0.42, M.monstera), 'x', 0, 11.0, U + 1.55, -1, 0.07);
-  onWall(F.painting(0.5, 0.42, M.monstera), 'x', 0, 11.9, U + 1.55, -1, 0.07);
+  // heads on the north wall under the air-con, beds pointing back at the loft door
+  P(F.singleBed(), 14.05, U, -2.27, FACE.S);
+  P(F.singleBed(), 15.55, U, -2.27, FACE.S);
+  P(F.nightstand(), 14.8, U, -3.05, FACE.S);
+  P(F.wardrobe(2.0, 2.25), 12.98, U, -2.2, FACE.E);                 // west wall, beside the en-suite door
+  P(F.dressingTable(0.9, 'small'), 15.2, U, -0.3, FACE.N);          // loft-door wall, with the prints
+  P(F.tubChair(), 16.05, U, -0.55, FACE.N - 0.6);
+  onWall(F.airCon(), 'x', -3.4, 14.8, U + 2.05, 1, 0.17);
+  onWall(F.curtains(1.4, U + 2.25, 2.1), 'z', 16.6, -1.65, 0, -1, 0.11);
+  onWall(F.painting(0.5, 0.42, M.monstera), 'x', 0, 14.55, U + 1.55, -1, 0.07);
+  onWall(F.painting(0.6, 0.45, M.monstera), 'x', 0, 15.75, U + 1.6, -1, 0.07);
 
   // ---------- en-suite 3, upstairs (photo 17) ----------
-  P(F.bathtub(1.75), 15.45, U, -0.52, 0);
-  P(F.toilet(), 16.25, U, -1.6, FACE.W);
-  showerAt(14.36, -3.3, 15.2, -2.45, U, ['x1', 'z1']);
-  P(F.basin(), 15.9, U, -3.03, FACE.S);
-  P(F.bin(), 16.3, U, -2.3, 0, false);
+  // bath along the left (west) wall, toilet under the window, shower beside the door (ensuite-3-1)
+  P(F.bathtub(1.6), 11.02, U, -1.0, Math.PI / 2);
+  P(F.toilet(), 11.2, U, -3.0, FACE.S);
+  showerAt(11.69, -3.3, 12.54, -2.45, U, ['x0', 'z1']);
+  P(F.basin(), 12.29, U, -1.55, FACE.W);
+  P(F.bin(), 10.8, U, -2.3, 0, false);
 }
 const S_Z1 = () => STAIR.z1 - 0.035;
 
@@ -538,7 +591,7 @@ function garden(scene) {
   palms.forEach(([x, z], i) => { const p = F.palm(6 + r(i) * 4); p.position.set(x, GRADE, z); p.rotation.y = r(i + 9) * 6; g.add(p); addCollider(x - 0.3, x + 0.3, GRADE, 10, z - 0.3, z + 0.3); });
   const trees = [[7, 22, 8, 4.5], [20, 20, 9, 5], [-8, 8, 8, 4], [25, 5, 7, 4], [14, -9, 7, 4], [-6, -6, 6, 3.5], [28, 16, 8, 5], [0, 29, 9, 5]];
   trees.forEach(([x, z, h, rr]) => { const t = F.broadTree(h, rr); t.position.set(x, GRADE, z); g.add(t); addCollider(x - 0.4, x + 0.4, GRADE, 10, z - 0.4, z + 0.4); });
-  for (const [x, z] of [[2, 12.4], [17.0, 6.0], [21, 3], [-0.9, 5], [8, -1.6], [18.5, -2.5], [1.8, 1.8], [-1.3, 9.6]]) {
+  for (const [x, z] of [[2, 12.4], [19.1, 6.7], [21, 3], [-0.9, 5], [8, -1.6], [18.5, -2.5], [1.8, 1.8], [-1.3, 9.6]]) {
     const s = F.shrub(0.6 + r(x) * 0.5); s.position.set(x, GRADE, z); g.add(s);
   }
   for (const [x, z, w, d] of [[28, -8, 9, 8], [-15, -4, 8, 9], [33, 12, 8, 10], [-16, 18, 9, 8]]) {
